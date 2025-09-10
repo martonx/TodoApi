@@ -1,4 +1,6 @@
 using Common;
+using Data;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,7 +8,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-//TODO: adatbázis beállítás
+//TODO: Dependency Injection
+
+var connectionString = builder.Configuration.GetConnectionString("ToDoDbContext");
+builder.Services.AddDbContext<ToDoDbContext>(options =>
+  options.UseSqlServer(connectionString));
 
 var app = builder.Build();
 
