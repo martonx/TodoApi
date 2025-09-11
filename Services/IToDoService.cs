@@ -4,6 +4,6 @@ namespace Services;
 
 public interface IToDoService
 {
-    Task Create(ToDo entity);
-    Task<List<ToDo>> ListAll();
+    Task CreateAsync(ToDo entity);
+    Task<List<ToDo>> ListAllAsync();
 }

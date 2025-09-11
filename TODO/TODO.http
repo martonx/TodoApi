@@ -1,6 +1,15 @@
 @TODO_HostAddress = http://localhost:5278
 
-GET {{TODO_HostAddress}}/weatherforecast/
+GET {{TODO_HostAddress}}/list
 Accept: application/json
 
 ###
+POST {{TODO_HostAddress}}/create
+Content-Type: application/json
+Accept: application/json
+
+{
+  "title": "Teszt 2",
+  "description": "Ez egy teszt 2 tennivaló",
+  "deadline": "2025-10-01"
+}
