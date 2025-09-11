@@ -38,4 +38,18 @@ app.MapPost("create", async (ToDo model, IToDoService service) =>
     return Results.Created();
 });
 
+app.MapPut("update", async (ToDo model, IToDoService service) =>
+{
+    await service.UpdateAsync(model);
+
+    return Results.Ok();
+});
+
+app.MapDelete("delete/{id:int}", async (int id, IToDoService service) =>
+{
+    await service.DeleteAsync(id);
+
+    return Results.Ok();
+});
+
 app.Run();
