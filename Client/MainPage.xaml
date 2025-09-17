@@ -47,8 +47,12 @@
                             <Label Grid.Column="0" Text="{Binding Id}" />
                             <Label Grid.Column="1" Text="{Binding Title}" />
                             <Label Grid.Column="2" Text="{Binding Description}" />
-                            <Button Grid.Column="3" Text="Törlés"></Button>
-                            <Button Grid.Column="4" Text="Módosítás"></Button>
+                            <Button Grid.Column="3"
+                                    Text="Törlés"
+                                    Clicked="OnDeleteClicked" />
+                            <Button Grid.Column="4"
+                                    Text="Módosítás"
+                                    Clicked="OnEditClicked" />
                         </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
