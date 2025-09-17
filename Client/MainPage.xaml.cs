@@ -2,57 +2,53 @@
 using System.Collections.ObjectModel;
 using System.Net.Http.Json;
 
-namespace Client
+namespace Client;
+
+public partial class MainPage : ContentPage
 {
-    public partial class MainPage : ContentPage
+    private readonly IHttpClientFactory httpClientFactory;
+    private ObservableCollection<ToDoDto> toDoCollection = [];
+
+    public MainPage(IHttpClientFactory httpClientFactory)
     {
-        private readonly IHttpClientFactory httpClientFactory;
-        private ObservableCollection<ToDoDto> toDoCollection = [];
+        this.httpClientFactory = httpClientFactory;
 
-        public MainPage(IHttpClientFactory httpClientFactory)
-        {
-            this.httpClientFactory = httpClientFactory;
-            InitializeComponent();
+        InitializeComponent();
 
-            ToDosView.ItemsSource = toDoCollection;
-        }
+        ToDosView.ItemsSource = toDoCollection;
+    }
 
-        private void OnWeatherClicked(object? sender, EventArgs e)
-        {
-            LoadData();
-        }
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+        
+        await LoadDataAsync();
+    }
 
-        private void LoadData()
-        {
-            var httpClient = httpClientFactory.CreateClient();
-            var toDos = httpClient.GetFromJsonAsync<List<ToDoDto>>("https://localhost:7241/list").Result;
+    private async Task LoadDataAsync()
+    {
+        var httpClient = httpClientFactory.CreateClient();
+        var toDos = await httpClient.GetFromJsonAsync<List<ToDoDto>>("https://localhost:7241/list");
 
-            toDoCollection.Clear();
+        toDoCollection.Clear();
 
-            foreach (var toDo in toDos)
-                toDoCollection.Add(toDo);
-        }
+        foreach (var toDo in toDos)
+            toDoCollection.Add(toDo);
+    }
 
-        private void OnDeleteClicked(object? sender, EventArgs e)
-        {
-            var button = (Button)sender;
-            var toDo = (ToDoDto)button.BindingContext;
-            //TODO melyik Id-jú elemre kattintottunk
-            var httpClient = httpClientFactory.CreateClient();
-            var toDos = httpClient.DeleteAsync($"https://localhost:7241/delete/{toDo.Id}").Result;
+    private async void OnDeleteClickedAsync(object? sender, EventArgs e)
+    {
+        var toDo = (ToDoDto)((Button)sender).BindingContext;
+        var httpClient = httpClientFactory.CreateClient();
+        var toDos = await httpClient.DeleteAsync($"https://localhost:7241/delete/{toDo.Id}");
 
-            LoadData();
-        }
+        await LoadDataAsync();
+    }
 
-        private void OnEditClicked(object? sender, EventArgs e)
-        {
-            var httpClient = httpClientFactory.CreateClient();
-            var toDos = httpClient.GetFromJsonAsync<List<ToDoDto>>("https://localhost:7241/list").Result;
+    private async void OnEditClickedAsync(object? sender, EventArgs e)
+    {
+        var toDo = (ToDoDto)((Button)sender).BindingContext;
 
-            toDoCollection.Clear();
-
-            foreach (var toDo in toDos)
-                toDoCollection.Add(toDo);
-        }
+        await Shell.Current.GoToAsync("details", new ShellNavigationQueryParameters { { "Id", toDo.Id } });
     }
 }

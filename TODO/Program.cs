@@ -1,4 +1,4 @@
-using Data;
+﻿using Data;
 using Microsoft.EntityFrameworkCore;
 using Services;
 
@@ -25,6 +25,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.MapGet("get/{id:int}", async (int id, IToDoService service) =>
+{
+    return await service.GetAsync(id);
+});
 
 app.MapGet("list", async (IToDoService service) =>
 {

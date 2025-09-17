@@ -13,6 +13,21 @@ public class ToDoService(ToDoDbContext db) : IToDoService
         await db.SaveChangesAsync();
     }
 
+    public async Task<ToDoDto> GetAsync(int id)
+    {
+        var entity = await db.ToDos.FirstOrDefaultAsync(e => e.Id == id);
+
+        return new ToDoDto
+        {
+            Id = entity.Id,
+            Created = entity.Created,
+            Deadline = entity.Deadline,
+            Description = entity.Description,
+            IsReady = entity.IsReady,
+            Title = entity.Title
+        };
+    }
+
     public async Task<List<ToDoDto>> ListAllAsync()
     {
         return await db.ToDos.Select(e => new ToDoDto

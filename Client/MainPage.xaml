@@ -1,19 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:Common;assembly=Common"
              x:Class="Client.MainPage">
-
     <ScrollView>
         <VerticalStackLayout
             Padding="30,0"
             Spacing="25">
             
-            <Button
+            <!--<Button
                 x:Name="WeatherBtn"
                 Text="Click me" 
                 SemanticProperties.Hint="Counts the number of times you click"
                 Clicked="OnWeatherClicked"
-                HorizontalOptions="Fill" />
+                HorizontalOptions="Fill" />-->
 
             <Grid Padding="10">
                 <Grid.RowDefinitions>
@@ -32,7 +32,7 @@
             
             <CollectionView x:Name="ToDosView" >
                 <CollectionView.ItemTemplate>
-                    <DataTemplate>
+                    <DataTemplate x:DataType="local:ToDoDto">
                         <Grid Padding="10">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
@@ -49,10 +49,10 @@
                             <Label Grid.Column="2" Text="{Binding Description}" />
                             <Button Grid.Column="3"
                                     Text="Törlés"
-                                    Clicked="OnDeleteClicked" />
+                                    Clicked="OnDeleteClickedAsync" />
                             <Button Grid.Column="4"
                                     Text="Módosítás"
-                                    Clicked="OnEditClicked" />
+                                    Clicked="OnEditClickedAsync" />
                         </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
