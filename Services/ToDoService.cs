@@ -1,4 +1,5 @@
-﻿using Data;
+﻿using Common;
+using Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace Services;
@@ -12,9 +13,17 @@ public class ToDoService(ToDoDbContext db) : IToDoService
         await db.SaveChangesAsync();
     }
 
-    public async Task<List<ToDo>> ListAllAsync()
+    public async Task<List<ToDoDto>> ListAllAsync()
     {
-        return await db.ToDos.ToListAsync();
+        return await db.ToDos.Select(e => new ToDoDto
+        {
+            Id = e.Id,
+            Created = e.Created,
+            Deadline = e.Deadline,
+            Description = e.Description,
+            IsReady = e.IsReady,
+            Title = e.Title
+        }).ToListAsync();
     }
 
     public async Task DeleteAsync(int id)

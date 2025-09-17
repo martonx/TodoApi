@@ -1,14 +1,18 @@
 ﻿using Common;
+using System.Collections.ObjectModel;
 using System.Net.Http.Json;
 
 namespace Client
 {
     public partial class MainPage : ContentPage
     {
+        private readonly IHttpClientFactory httpClientFactory;
+        private ObservableCollection<ToDoDto> toDoCollection = [];
         int count = 0;
 
-        public MainPage()
+        public MainPage(IHttpClientFactory httpClientFactory)
         {
+            this.httpClientFactory = httpClientFactory;
             InitializeComponent();
         }
 
@@ -26,10 +30,11 @@ namespace Client
 
         private void OnWeatherClicked(object? sender, EventArgs e)
         {
-            var httpClient = new HttpClient();
-            var response = httpClient.GetFromJsonAsync<List<WeatherForecast>>("https://localhost:7241/weatherforecast").Result;
+            var httpClient = httpClientFactory.CreateClient();
+            var toDos = httpClient.GetFromJsonAsync<List<ToDoDto>>("https://localhost:7241/list").Result;
 
-            WeatherInfo.Text = response.First().Summary;
+            foreach (var toDo in toDos)
+                toDoCollection.Add(toDo);
         }
     }
 }
