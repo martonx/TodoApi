@@ -36,6 +36,11 @@ public partial class MainPage : ContentPage
             toDoCollection.Add(toDo);
     }
 
+    private async void OnAddNewClickedAsync(object? sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync("details");
+    }
+
     private async void OnDeleteClickedAsync(object? sender, EventArgs e)
     {
         var toDo = (ToDoDto)((Button)sender).BindingContext;

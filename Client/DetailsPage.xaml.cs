@@ -17,7 +17,8 @@ public partial class DetailsPage : ContentPage, IQueryAttributable
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
-        id = (int)query["Id"];
+        query.TryGetValue("Id", out var idObject);
+        id = (int)(idObject ?? 0);
     }
 
     protected override async void OnAppearing()
@@ -27,11 +28,19 @@ public partial class DetailsPage : ContentPage, IQueryAttributable
         await LoadDataAsync();
     }
 
-    private async Task LoadDataAsync()
+    private async ValueTask LoadDataAsync()
     {
-        var httpClient = httpClientFactory.CreateClient();
-        toDo = await httpClient.GetFromJsonAsync<ToDoDto>($"https://localhost:7241/get/{id}");
-        TodoId.Text = toDo.Id.ToString();
+        if (id == 0)
+        {
+            toDo = new ToDoDto { Title = "Ez egy új todo" };
+            return;
+        }
+        else
+        {
+            var httpClient = httpClientFactory.CreateClient();
+            toDo = await httpClient.GetFromJsonAsync<ToDoDto>($"https://localhost:7241/get/{id}");
+        }
 
+        TodoId.Text = toDo.Id.ToString();
     }
 }

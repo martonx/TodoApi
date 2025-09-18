@@ -8,12 +8,11 @@
             Padding="30,0"
             Spacing="25">
             
-            <!--<Button
-                x:Name="WeatherBtn"
-                Text="Click me" 
-                SemanticProperties.Hint="Counts the number of times you click"
-                Clicked="OnWeatherClicked"
-                HorizontalOptions="Fill" />-->
+            <Button
+                x:Name="AddNew"
+                Text="Új létrehozás" 
+                Clicked="OnAddNewClickedAsync"
+                HorizontalOptions="Fill" />
 
             <Grid Padding="10">
                 <Grid.RowDefinitions>
