@@ -28,9 +28,9 @@ public class ToDoService(ToDoDbContext db) : IToDoService
         };
     }
 
-    public async Task<List<ToDoDto>> ListAllAsync()
+    public async Task<List<ToDoDto>> ListAllAsync(bool? isReady)
     {
-        return await db.ToDos.Select(e => new ToDoDto
+        var query = db.ToDos.Select(e => new ToDoDto
         {
             Id = e.Id,
             Created = e.Created,
@@ -38,7 +38,12 @@ public class ToDoService(ToDoDbContext db) : IToDoService
             Description = e.Description,
             IsReady = e.IsReady,
             Title = e.Title
-        }).ToListAsync();
+        });
+
+        if (isReady.HasValue)
+            query = query.Where(e => e.IsReady == isReady.Value);
+
+        return await query.ToListAsync();
     }
 
     public async Task DeleteAsync(int id)

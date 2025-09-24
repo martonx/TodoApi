@@ -1,4 +1,5 @@
 ﻿using Data;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Services;
 
@@ -31,7 +32,7 @@ app.MapGet("get/{id:int}", async (int id, IToDoService service) =>
     return await service.GetAsync(id);
 });
 
-app.MapGet("list", async (IToDoService service) =>
+app.MapGet("list", async ([FromQuery(Name = "isReady")] bool? isReady, IToDoService service) =>
 {
     return await service.ListAllAsync();
 });
