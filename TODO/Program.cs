@@ -34,7 +34,7 @@ app.MapGet("get/{id:int}", async (int id, IToDoService service) =>
 
 app.MapGet("list", async ([FromQuery(Name = "isReady")] bool? isReady, IToDoService service) =>
 {
-    return await service.ListAllAsync();
+    return await service.ListAllAsync(isReady);
 });
 
 app.MapPost("create", async (ToDo model, IToDoService service) =>

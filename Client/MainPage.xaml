@@ -2,7 +2,12 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:Common;assembly=Common"
+             xmlns:converter="clr-namespace:Client"
              x:Class="Client.MainPage">
+    <ContentPage.Resources>
+        <converter:ExpiredColorChangedConverter x:Key="colorChangedConverter" />
+    </ContentPage.Resources>
+
     <ScrollView>
         <VerticalStackLayout
             Padding="30,0"
@@ -32,7 +37,7 @@
             <CollectionView x:Name="ToDosView" >
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="local:ToDoDto">
-                        <Grid Padding="10">
+                        <Grid Padding="10" BackgroundColor="{Binding Path=Expired, Converter={StaticResource colorChangedConverter}}">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>

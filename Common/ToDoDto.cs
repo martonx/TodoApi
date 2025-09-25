@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Common;
+﻿namespace Common;
 
 public record ToDoDto ()
 {
@@ -14,4 +8,5 @@ public record ToDoDto ()
     public DateTime Deadline { get; set; }
     public DateTime Created { get; set; }
     public bool IsReady { get; set; }
+    public bool Expired => IsReady == false && Deadline < DateTime.Now;
 }
