@@ -32,7 +32,9 @@ app.MapGet("get/{id:int}", async (int id, IToDoService service) =>
     return await service.GetAsync(id);
 });
 
-app.MapGet("list", async ([FromQuery(Name = "isReady")] bool? isReady, IToDoService service) =>
+app.MapGet("list", async (
+    [FromQuery(Name = "isReady")] bool? isReady,
+    IToDoService service) =>
 {
     return await service.ListAllAsync(isReady);
 });

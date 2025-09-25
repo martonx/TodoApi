@@ -2,12 +2,8 @@
 
 namespace Client;
 
-public class ExpiredColorChangedConverter : IValueConverter
+public class ExpiredColorChangedConverter() : IValueConverter
 {
-    public ExpiredColorChangedConverter()
-    {
-    }
-
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         return (bool)value ? Colors.Red : Colors.White;
