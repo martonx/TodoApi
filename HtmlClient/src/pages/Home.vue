@@ -25,7 +25,11 @@ async function loadData() {
   const response = await fetch(url);
   const result = await response.json();
   localState.toDos = [];
-  result.forEach(toDo => localState.toDos.push(toDo));
+  result.forEach(toDo => {
+    const deadline = new Date(toDo.deadline);
+    toDo.expired = !toDo.isReady && deadline < new Date();
+    localState.toDos.push(toDo);
+  });
 }
 </script>
 
@@ -41,14 +45,18 @@ async function loadData() {
   </div>
   <ul>
     <li v-for="toDo in localState.toDos">
-      <span>{{ toDo.id }}</span>
-      <span>{{ toDo.title }}</span>
-      <span>{{ toDo.deadline }}</span>
-      <span>{{ toDo.isReady }}</span>
+      <div :class="{ red: toDo.expired }">
+        <span>{{ toDo.id }}</span>
+        <span>{{ toDo.title }}</span>
+        <span>{{ toDo.deadline }}</span>
+        <span>{{ toDo.isReady }}</span>
+      </div>
     </li>
   </ul>
 </template>
 
 <style scoped>
-
+.red {
+  background-color: red;
+}
 </style>
