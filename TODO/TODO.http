@@ -1,6 +1,6 @@
 @TODO_HostAddress = http://localhost:5278
 
-GET {{TODO_HostAddress}}/list?isReady=true
+GET {{TODO_HostAddress}}/list?isReady=false&pageNumber=2&pageSize=25
 Accept: application/json
 
 ###
@@ -20,9 +20,9 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "id": 2,
-  "title": "Teszt 2 (updated)",
-  "description": "Ez egy teszt 2 tennivaló (updated)",
+  "id": 3,
+  "title": "Teszt 3 (updated)",
+  "description": "Ez egy teszt 3 tennivaló (updated)",
   "deadline": "2025-11-01",
   "isReady": true
 }

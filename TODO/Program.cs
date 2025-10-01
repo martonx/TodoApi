@@ -17,7 +17,21 @@ builder.Services.AddDbContext<ToDoDbContext>(options =>
 // Configure the DI container
 builder.Services.AddTransient<IToDoService, ToDoService>();
 
+var allowSpecificOrigins = "_allowSpecificOrigins";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(allowSpecificOrigins,
+                      policy =>
+                      {
+                          policy.WithOrigins("*")
+                            .AllowAnyHeader()
+                            .AllowAnyMethod();
+                      });
+});
+
 var app = builder.Build();
+
+app.UseCors(allowSpecificOrigins);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
