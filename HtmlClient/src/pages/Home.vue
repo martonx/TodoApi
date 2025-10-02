@@ -34,8 +34,7 @@ async function loadData() {
 </script>
 
 <template>
-  <h1>Hello from Home page</h1>
-  <h2>Todos</h2>
+  <h1>Todos</h1>
   <div>
     <label>Show only active:</label>
     <input
@@ -44,6 +43,14 @@ async function loadData() {
       @change="isReadyChanged"></input>
   </div>
   <ul>
+    <li>
+      <div>
+        <span>ID</span>
+        <span>Title</span>
+        <span>Deadline</span>
+        <span>IsReady</span>
+      </div>
+    </li>
     <li v-for="toDo in localState.toDos">
       <div :class="{ red: toDo.expired }">
         <span>{{ toDo.id }}</span>
@@ -56,6 +63,10 @@ async function loadData() {
 </template>
 
 <style scoped>
+li div {
+  display: flex;
+  justify-content: space-between;
+}
 .red {
   background-color: red;
 }
