@@ -1,9 +1,13 @@
 <script setup>
-import { ref } from 'vue'
+import { onBeforeMount, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 
-const count = ref(0)
 const router = useRouter();
+const id = router.currentRoute.value.params.id;
+
+onBeforeMount(async () => {
+  //TODO:
+});
 </script>
 
 <template>
