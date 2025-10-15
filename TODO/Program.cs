@@ -19,9 +19,9 @@ builder.Services.AddOpenApiDocument(config =>
     config.OperationProcessors.Add(new NSwag.Generation.Processors.Security.AspNetCoreOperationSecurityScopeProcessor("JWT"));
 });
 
-//builder.Services.AddAuthorizationBuilder()
-//  .AddPolicy("admin", policy => policy.RequireRole("Admin"))
-//  .AddPolicy("user", policy => policy.RequireRole("User"));
+builder.Services.AddAuthorizationBuilder()
+  .AddPolicy("admin", policy => policy.RequireRole("Admin"))
+  .AddPolicy("user", policy => policy.RequireRole("User"));
 
 // Configure the Database connection
 var connectionString = builder.Configuration.GetConnectionString("ToDoDbContext");
@@ -29,6 +29,7 @@ builder.Services.AddDbContext<ToDoDbContext>(options =>
   options.UseSqlServer(connectionString));
 
 builder.Services.AddIdentityApiEndpoints<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ToDoDbContext>();
 
 // Configure the DI container
@@ -78,7 +79,7 @@ app.MapGroup("ToDo").WithTags("ToDo").MapPost("create", async (ToDo model, IToDo
     await service.CreateAsync(model);
 
     return Results.Created();
-}).RequireAuthorization();
+}).RequireAuthorization("admin");
 
 app.MapGroup("ToDo").WithTags("ToDo").MapPut("update", async (ToDo model, IToDoService service) =>
 {
