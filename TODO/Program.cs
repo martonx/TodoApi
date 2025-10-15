@@ -39,8 +39,6 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
-
 app.MapGet("get/{id:int}", async (int id, IToDoService service) =>
 {
     return await service.GetAsync(id);
