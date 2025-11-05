@@ -1,6 +1,10 @@
 ﻿using Common;
+
 using Data;
+
 using Microsoft.EntityFrameworkCore;
+
+using System.Threading;
 
 namespace Services;
 
@@ -59,7 +63,7 @@ public class ToDoService(ToDoDbContext db) : IToDoService
 
     public async Task UpdateAsync(ToDo model)
     {
-        //Régi módi update
+        //1. Régi módi update
         //var entity = await db.ToDos.SingleOrDefaultAsync(e => e.Id == model.Id);
 
         //if (entity is null)
@@ -69,6 +73,14 @@ public class ToDoService(ToDoDbContext db) : IToDoService
         //entity.Title = model.Title;
         //entity.Deadline = model.Deadline;
         //entity.IsReady = model.IsReady;
+
+        //await db.SaveChangesAsync();
+
+        //2. Régi módszer EF-es mappeléssel
+        //var entity = await db.ToDos.SingleOrDefaultAsync(e => e.Id == model.Id)
+        //    ?? throw new Exception("Entity not found");
+
+        //db.Entry(entity).CurrentValues.SetValues(model);
 
         //await db.SaveChangesAsync();
 

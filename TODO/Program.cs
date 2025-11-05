@@ -23,6 +23,9 @@ builder.Services.AddAuthorizationBuilder()
   .AddPolicy("admin", policy => policy.RequireRole("Admin"))
   .AddPolicy("user", policy => policy.RequireRole("User"));
 
+//Ez a tesztekben használhatósághoz kell, hogy a teszt framework elérje az endpointokat
+builder.Services.AddEndpointsApiExplorer();
+
 // Configure the Database connection
 var connectionString = builder.Configuration.GetConnectionString("ToDoDbContext");
 builder.Services.AddDbContext<ToDoDbContext>(options =>
@@ -114,3 +117,6 @@ if (!await roles.AnyAsync(role => role.Name == "Admin"))
 }
 
 app.Run();
+
+//Ez a tesztekben használhatósághoz kell, hogy publikusan elérhető legyen a Program osztály
+public partial class Program;
