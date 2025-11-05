@@ -1,20 +1,28 @@
-﻿namespace Api.Tests
+﻿using Common;
+using System.Net.Http.Json;
+
+namespace Api.Tests
 {
     public class Tests
     {
         [ClassDataSource<WebApplicationFactory>(Shared = SharedType.PerTestSession)]
         public required WebApplicationFactory WebApplicationFactory { get; init; }
 
-        [Test]
-        public async Task Test()
+        private HttpClient client => WebApplicationFactory.CreateClient();
+
+        [BeforeEvery(Test)]
+        public static async Task Setup(TestContext context, CancellationToken cancellationToken)
         {
-            var client = WebApplicationFactory.CreateClient();
+            // Use cancellation token for timeout-aware operations
+            //await SomeLongRunningOperation(cancellationToken);
+        }
 
-            var response = await client.GetAsync("/todo/list");
+        [Test]
+        public async Task TestListing()
+        {
+            var toDos = await client.GetFromJsonAsync<List<ToDoDto>>("/todo/list");
 
-            var stringContent = await response.Content.ReadAsStringAsync();
-
-            await Assert.That(stringContent).IsEqualTo("Hello, World!");
+            await Assert.That(toDos).IsNotEmpty();
         }
     }
 }
