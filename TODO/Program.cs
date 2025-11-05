@@ -19,6 +19,10 @@ builder.Services.AddOpenApiDocument(config =>
     config.OperationProcessors.Add(new NSwag.Generation.Processors.Security.AspNetCoreOperationSecurityScopeProcessor("JWT"));
 });
 
+builder.Services.AddAuthorizationBuilder()
+  .AddPolicy("admin", policy => policy.RequireRole("Admin"))
+  .AddPolicy("user", policy => policy.RequireRole("User"));
+
 // Configure the Database connection
 var connectionString = builder.Configuration.GetConnectionString("ToDoDbContext");
 builder.Services.AddDbContext<ToDoDbContext>(options =>
@@ -61,34 +65,52 @@ app.MapGroup("Account").WithTags("Account").MapIdentityApi<IdentityUser>();
 app.MapGroup("ToDo").WithTags("ToDo").MapGet("get/{id:int}", async (int id, IToDoService service) =>
 {
     return await service.GetAsync(id);
-});
+}).RequireAuthorization();
 
 app.MapGroup("ToDo").WithTags("ToDo").MapGet("list", async (
     [FromQuery(Name = "isReady")] bool? isReady,
     IToDoService service) =>
 {
     return await service.ListAllAsync(isReady);
-});
+}).RequireAuthorization();
 
 app.MapGroup("ToDo").WithTags("ToDo").MapPost("create", async (ToDo model, IToDoService service) =>
 {
     await service.CreateAsync(model);
 
     return Results.Created();
-});
+}).RequireAuthorization("admin");
 
 app.MapGroup("ToDo").WithTags("ToDo").MapPut("update", async (ToDo model, IToDoService service) =>
 {
     await service.UpdateAsync(model);
 
     return Results.Ok();
-});
+}).RequireAuthorization();
 
 app.MapGroup("ToDo").WithTags("ToDo").MapDelete("delete/{id:int}", async (int id, IToDoService service) =>
 {
     await service.DeleteAsync(id);
 
     return Results.Ok();
-});
+}).RequireAuthorization();
+
+//Auto migration
+using var serviceScope = (app as IApplicationBuilder).ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope();
+using var dbContext = serviceScope.ServiceProvider.GetService<ToDoDbContext>();
+var migrations = await dbContext.Database.GetPendingMigrationsAsync();
+if (migrations.Any())
+{
+    await dbContext.Database.MigrateAsync();
+}
+
+var roles = dbContext.Set<IdentityRole>();
+if (!await roles.AnyAsync(role => role.Name == "Admin"))
+{
+    roles.Add(new IdentityRole { Name = "Admin" });
+    roles.Add(new IdentityRole { Name = "User" });
+
+    await dbContext.SaveChangesAsync();
+}
 
 app.Run();
