@@ -19,7 +19,7 @@ public class Tests
     {
         client = WebApplicationFactory.CreateClient();
         var response = await client.PostAsJsonAsync("/account/login",
-            new LoginRequest { Email = "lajosmarton@hotmail.com", Password = "Lali1978*" });
+            new LoginRequest { Email = "lajosmarton@hotmail.com", Password = "Password1." });
         var responseString = await response.Content.ReadAsStringAsync();
         var jwtResponse = JsonSerializer.Deserialize<AccessTokenResponse>(responseString,
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true });

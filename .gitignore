@@ -13,3 +13,5 @@ Services/bin
 HtmlClient/.vscode
 Api.Tests/Api.Tests/bin
 Api.Tests/Api.Tests/obj
+Unit.Tests/bin
+Unit.Tests/obj

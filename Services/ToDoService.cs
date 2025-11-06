@@ -17,15 +17,9 @@ public class ToDoService(ToDoDbContext db) : IToDoService
     {
         var entity = await db.ToDos.FirstOrDefaultAsync(e => e.Id == id);
 
-        return new ToDoDto
-        {
-            Id = entity.Id,
-            Created = entity.Created,
-            Deadline = entity.Deadline,
-            Description = entity.Description,
-            IsReady = entity.IsReady,
-            Title = entity.Title
-        };
+        var dto = CreateDtoFrom(entity);
+
+        return dto;
     }
 
     public async Task<List<ToDoDto>> ListAllAsync(bool? isReady)
@@ -88,4 +82,14 @@ public class ToDoService(ToDoDbContext db) : IToDoService
                         .SetProperty(e => e.Deadline, model.Deadline)
                         .SetProperty(e => e.IsReady, model.IsReady));
     }
+
+    public ToDoDto CreateDtoFrom(ToDo entity) => new()
+    {
+        Id = entity.Id,
+        Created = entity.Created,
+        Deadline = entity.Deadline,
+        Description = entity.Description,
+        IsReady = entity.IsReady,
+        Title = entity.Title
+    };
 }
