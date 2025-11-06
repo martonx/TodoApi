@@ -4,7 +4,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Services;
 
+//Ez a sor felel az alap web szerver létrehozásáért.
+//Builder pattern-t használ, ahol a konfigurációs beállításokat a builder objektumon keresztül adjuk meg.
 var builder = WebApplication.CreateBuilder(args);
+
+//Elkezdjük a buildert felparaméterezni a szükséges szolgáltatásokkal és konfigurációkkal.
 
 builder.Services.AddOpenApiDocument(config =>
 {
@@ -52,6 +56,7 @@ builder.Services.AddCors(options =>
                       });
 });
 
+//A fentebb megadott konfigurációk alapján létrehozzuk a web alkalmazás objektumot.
 var app = builder.Build();
 
 app.UseCors(allowSpecificOrigins);
@@ -110,6 +115,7 @@ if (migrations.Any())
 var roles = dbContext.Set<IdentityRole>();
 if (!await roles.AnyAsync(role => role.Name == "Admin"))
 {
+    roles.Add(new IdentityRole { Name = "SuperAdmin" });
     roles.Add(new IdentityRole { Name = "Admin" });
     roles.Add(new IdentityRole { Name = "User" });
 
