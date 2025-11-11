@@ -104,13 +104,11 @@ app.MapGroup("ToDo").WithTags("ToDo").MapDelete("delete/{id:int}", async (int id
 }).RequireAuthorization();
 
 //Auto migration
-using var serviceScope = (app as IApplicationBuilder).ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope();
-using var dbContext = serviceScope.ServiceProvider.GetService<ToDoDbContext>();
+using var scope = app.Services.CreateScope();
+using var dbContext = scope.ServiceProvider.GetRequiredService<ToDoDbContext>();
 var migrations = await dbContext.Database.GetPendingMigrationsAsync();
 if (migrations.Any())
-{
     await dbContext.Database.MigrateAsync();
-}
 
 var roles = dbContext.Set<IdentityRole>();
 if (!await roles.AnyAsync(role => role.Name == "Admin"))
