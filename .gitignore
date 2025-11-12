@@ -15,3 +15,5 @@ Api.Tests/Api.Tests/bin
 Api.Tests/Api.Tests/obj
 Unit.Tests/bin
 Unit.Tests/obj
+Integration.Tests/bin
+Integration.Tests/obj
