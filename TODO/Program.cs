@@ -4,12 +4,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Services;
 
-//Ez a sor felel az alap web szerver létrehozásáért.
-//Builder pattern-t használ, ahol a konfigurációs beállításokat a builder objektumon keresztül adjuk meg.
+// Ez a sor felel az alap web szerver létrehozásáért.
+// Builder pattern-t használ, ahol a konfigurációs beállításokat a builder objektumon keresztül adjuk meg.
 var builder = WebApplication.CreateBuilder(args);
 
-//Elkezdjük a buildert felparaméterezni a szükséges szolgáltatásokkal és konfigurációkkal.
+// Elkezdjük a buildert felparaméterezni a szükséges szolgáltatásokkal és konfigurációkkal.
 
+// Swaggerhez, azon belül is az authentikációhoz szükséges beállítások
 builder.Services.AddOpenApiDocument(config =>
 {
     config.AddSecurity("JWT", new NSwag.OpenApiSecurityScheme
@@ -23,11 +24,12 @@ builder.Services.AddOpenApiDocument(config =>
     config.OperationProcessors.Add(new NSwag.Generation.Processors.Security.AspNetCoreOperationSecurityScopeProcessor("JWT"));
 });
 
+// Authorization policy-k hozzáadása, ezekre tudunk majd hivatkozni RequireAuthorization metódusokban.
 builder.Services.AddAuthorizationBuilder()
   .AddPolicy("admin", policy => policy.RequireRole("Admin"))
   .AddPolicy("user", policy => policy.RequireRole("User"));
 
-//Ez a tesztekben használhatósághoz kell, hogy a teszt framework elérje az endpointokat
+// Ez a tesztekben használhatósághoz kell, hogy a teszt framework elérje az endpointokat
 builder.Services.AddEndpointsApiExplorer();
 
 // Configure the Database connection
@@ -35,6 +37,7 @@ var connectionString = builder.Configuration.GetConnectionString("ToDoDbContext"
 builder.Services.AddDbContext<ToDoDbContext>(options =>
   options.UseSqlServer(connectionString));
 
+// accountEndpoints.MapIdentityApi<IdentityUser>(); - ezekhez az endpointokhoz szükséges service-eket adja hozzá a DI-hoz
 builder.Services.AddIdentityApiEndpoints<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ToDoDbContext>();
@@ -42,8 +45,10 @@ builder.Services.AddIdentityApiEndpoints<IdentityUser>(options => options.SignIn
 // Configure the DI container
 builder.Services.AddTransient<IToDoService, ToDoService>();
 
+// Authorization szolgáltatás hozzáadása a DI konténerhez
 builder.Services.AddAuthorization();
 
+// CORS beállítások hozzáadása a DI konténerhez, CORS a böngészőből érkező kérések kezeléséhez szükséges.
 var allowSpecificOrigins = "_allowSpecificOrigins";
 builder.Services.AddCors(options =>
 {
@@ -59,15 +64,19 @@ builder.Services.AddCors(options =>
 //A fentebb megadott konfigurációk alapján létrehozzuk a web alkalmazás objektumot.
 var app = builder.Build();
 
+// CORS middleware hozzáadása az alkalmazás middleware pipeline-jához
 app.UseCors(allowSpecificOrigins);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    // Swagger middleware hozzáadása a pipeline-hoz fejlesztői környezetben
     app.UseOpenApi();
     app.UseSwaggerUi();
 }
 
+
+// User kezeléshez szükséges endpointok hozzáadása
 var accountEndpoints = app.MapGroup("Account").WithTags("Account");
 accountEndpoints.MapIdentityApi<IdentityUser>();
 
@@ -86,6 +95,7 @@ accountEndpoints.MapPost("setrole", async (SetRoleRequest request, HttpContext h
     return Results.Ok();
 }).RequireAuthorization();
 
+// ToDo endpointok hozzáadása
 var toDoEndpoints = app.MapGroup("ToDo").WithTags("ToDo");
 toDoEndpoints.MapGet("get/{id:int}", async (int id, IToDoService service) =>
 {
@@ -120,7 +130,7 @@ toDoEndpoints.MapDelete("delete/{id:int}", async (int id, IToDoService service) 
     return Results.Ok();
 }).RequireAuthorization();
 
-//Auto migration
+// Auto migration
 using var scope = app.Services.CreateScope();
 using var dbContext = scope.ServiceProvider.GetRequiredService<ToDoDbContext>();
 var migrations = await dbContext.Database.GetPendingMigrationsAsync();
@@ -137,6 +147,7 @@ if (!await roles.AnyAsync(role => role.Name == "Admin"))
     await dbContext.SaveChangesAsync();
 }
 
+// Az alkalmazás elindítása, innentől kezdve képes fogadni a bejövő HTTP kéréseket.
 app.Run();
 
 //Ez a tesztekben használhatósághoz kell, hogy publikusan elérhető legyen a Program osztály
