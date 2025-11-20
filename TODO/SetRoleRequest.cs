@@ -1,0 +1,1 @@
+﻿public record SetRoleRequest (string Role);

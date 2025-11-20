@@ -68,35 +68,52 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUi();
 }
 
-app.MapGroup("Account").WithTags("Account").MapIdentityApi<IdentityUser>();
+var accountEndpoints = app.MapGroup("Account").WithTags("Account");
+accountEndpoints.MapIdentityApi<IdentityUser>();
 
-app.MapGroup("ToDo").WithTags("ToDo").MapGet("get/{id:int}", async (int id, IToDoService service) =>
+accountEndpoints.MapPost("setrole", async (SetRoleRequest request, HttpContext httpContext, UserManager<IdentityUser> userManager) =>
+{
+    var userName = httpContext.User.Identity!.Name!;
+    var user = await userManager.FindByNameAsync(userName);
+    var roles = await userManager.GetRolesAsync(user);
+    foreach (var role in roles)
+    {
+        await userManager.RemoveFromRoleAsync(user, role);
+    }
+
+    await userManager.AddToRoleAsync(user, request.Role);
+
+    return Results.Ok();
+}).RequireAuthorization();
+
+var toDoEndpoints = app.MapGroup("ToDo").WithTags("ToDo");
+toDoEndpoints.MapGet("get/{id:int}", async (int id, IToDoService service) =>
 {
     return await service.GetAsync(id);
 }).RequireAuthorization();
 
-app.MapGroup("ToDo").WithTags("ToDo").MapGet("list", async (
+toDoEndpoints.MapGet("list", async (
     [FromQuery(Name = "isReady")] bool? isReady,
     IToDoService service) =>
 {
     return await service.ListAllAsync(isReady);
 }).RequireAuthorization();
 
-app.MapGroup("ToDo").WithTags("ToDo").MapPost("create", async (ToDo model, IToDoService service) =>
+toDoEndpoints.MapPost("create", async (ToDo model, IToDoService service) =>
 {
     await service.CreateAsync(model);
 
     return Results.Created();
 }).RequireAuthorization("admin");
 
-app.MapGroup("ToDo").WithTags("ToDo").MapPut("update", async (ToDo model, IToDoService service) =>
+toDoEndpoints.MapPut("update", async (ToDo model, IToDoService service) =>
 {
     await service.UpdateAsync(model);
 
     return Results.Ok();
 }).RequireAuthorization();
 
-app.MapGroup("ToDo").WithTags("ToDo").MapDelete("delete/{id:int}", async (int id, IToDoService service) =>
+toDoEndpoints.MapDelete("delete/{id:int}", async (int id, IToDoService service) =>
 {
     await service.DeleteAsync(id);
 
@@ -113,9 +130,9 @@ if (migrations.Any())
 var roles = dbContext.Set<IdentityRole>();
 if (!await roles.AnyAsync(role => role.Name == "Admin"))
 {
-    roles.Add(new IdentityRole { Name = "SuperAdmin" });
-    roles.Add(new IdentityRole { Name = "Admin" });
-    roles.Add(new IdentityRole { Name = "User" });
+    roles.Add(new IdentityRole { Name = "SuperAdmin", NormalizedName = "SUPERADMIN" });
+    roles.Add(new IdentityRole { Name = "Admin", NormalizedName = "ADMIN" });
+    roles.Add(new IdentityRole { Name = "User", NormalizedName = "USER" });
 
     await dbContext.SaveChangesAsync();
 }
